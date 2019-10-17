@@ -1,5 +1,8 @@
 package edu.spbu;
 
+import edu.spbu.matrix.DenseMatrix;
+import edu.spbu.matrix.Matrix;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -48,8 +51,6 @@ public class MatrixGenerator
 
   private static void testPerformance()
   {
-    // Uncomment the code to Test your library
-    /*
     System.out.println("Starting loading dense matrices");
     Matrix m1 = new DenseMatrix(MATRIX1_NAME);
     System.out.println("1 loaded");
@@ -58,7 +59,7 @@ public class MatrixGenerator
     long start = System.currentTimeMillis();
     m1.mul(m2);
     System.out.println("Dense Matrix time: " +(System.currentTimeMillis() - start));
-
+    /*
     System.out.println("Starting loading sparse matrices");
     m1 = new SparseMatrix(MATRIX1_NAME);
     System.out.println("1 loaded");
