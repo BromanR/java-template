@@ -28,7 +28,7 @@ public interface Matrix
    * @param j - horizontal coordinate of the element
    * @return the element at (i, j)
    */
-  double get(int i, int j);
+ // double get(int i, int j);
 
   /**
    * Returns height of a matrix

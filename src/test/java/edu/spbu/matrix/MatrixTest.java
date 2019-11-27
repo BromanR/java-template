@@ -30,4 +30,15 @@ public class MatrixTest
     Matrix expected = new DenseMatrix("result45.txt");
     assertEquals(expected, m4.mul(m5));
   }
+
+  @Test
+  public void mulSSEx1() {
+    Matrix m1 = new SparseMatrix("SparseA1.txt");
+    Matrix m2 = new SparseMatrix("SparseA2.txt");
+    Matrix actual=m1.mul(m2);
+    Matrix expected=new SparseMatrix("ResA1xA2.txt");
+    System.out.println("expected:"+(expected).toString());
+    System.out.println("actual:"+((SparseMatrix)actual).toString());
+    assertEquals(expected, actual);
+  }
 }

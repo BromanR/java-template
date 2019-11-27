@@ -10,9 +10,9 @@ import java.util.LinkedList;
  * Плотная матрица
  */
 public class DenseMatrix implements Matrix {
-  private int height, width;
-  private double[][] matrix;
-  private int hachCode;
+  public int height, width;
+  public double[][] matrix;
+  public int hachCode;
 
   private DenseMatrix(int height, int width, double[][] matrix) {
     this.height = height;
@@ -128,7 +128,6 @@ public class DenseMatrix implements Matrix {
     return false;
   }
 
-  @Override
   public double get(int i, int j) {
     if (i < this.getHeight() && j < this.getWidth()) {
       return this.matrix[i][j];
@@ -145,4 +144,30 @@ public class DenseMatrix implements Matrix {
   public int getWidth() {
     return this.width;
   }
+
+  //
+  public DenseMatrix(double[][] input)
+  {
+    if (input.length > 0 )
+    {
+      matrix=input;
+      height=input.length;
+      width=input[0].length;
+    }
+  }
+
+
+  public DenseMatrix transpose()
+  {
+    double[][] transposedDMtx=new double[width][height];
+    for(int i=0;i<width;i++)
+    {
+      for(int j=0;j<height;j++)
+      {
+        transposedDMtx[i][j]=matrix[j][i];
+      }
+    }
+    return new DenseMatrix(transposedDMtx);
+  }
+
 }
