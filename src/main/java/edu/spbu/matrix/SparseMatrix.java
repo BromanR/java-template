@@ -1,79 +1,73 @@
 package edu.spbu.matrix;
 
-
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Разряженная матрица
  */
 
-public class SparseMatrix implements Matrix
-{
-  public HashMap<Point, Double> SMatr;
-  public int nr;
-  public int nc;
+public class SparseMatrix implements Matrix {
+  public HashMap<Point, Double> val;
+  public int height;
+  public int width;
+
+
+  public SparseMatrix(HashMap<Point, Double> val, int height, int width) {
+    this.val = val;
+    this.height = height;
+    this.width = width;
+  }
 
   /**
    * загружает матрицу из файла
+   *
    * @param fileName
    */
   public SparseMatrix(String fileName) {
     try {
-      FileReader rdr = new FileReader(fileName);
-      BufferedReader bufR = new BufferedReader(rdr);
-      SMatr=new HashMap<>();
+      FileReader fr = new FileReader(fileName);
+      BufferedReader bufR = new BufferedReader(fr);
+      val = new HashMap<>();
       String[] Currln;
-      String line=bufR.readLine();
-      int length=0,height=0;
+      String line = bufR.readLine();
+      int length = 0, height = 0;
       double element;
-      while(line!=null)
-      {
-        System.out.println(line);
+      while (line != null) {
+        // System.out.println(line);
         Currln = line.split(" ");
-        String intArrayString = Arrays.toString(Currln);
+        //String intArrayString = Arrays.toString(Currln);
         //System.out.println(intArrayString);
         length = Currln.length;
         for (int i = 0; i < length; i++) {
-          if(!Currln[0].isEmpty()) {
+          if (!Currln[0].isEmpty()) {
             element = Double.parseDouble(Currln[i]);
-            if(element!=0) {
-              Point p=new Point(height,i);
-              SMatr.put(p, element);
+            if (element != 0) {
+              Point coord = new Point(height, i);
+              val.put(coord, element);
             }
           }
         }
         height++;
-        line=bufR.readLine();
+        line = bufR.readLine();
       }
-      rdr.close();
-      nr=height;
-      nc=length;
+      fr.close();
+      this.height = height;
+      width = length;
 
-    }
-    catch(FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       System.out.println("File not found");
       e.printStackTrace();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
 
-  }
-
-  public SparseMatrix(HashMap<Point,Double> SMatr,int nrows,int ncols)
-  {
-    this.SMatr=SMatr;
-    this.nr=nrows;
-    this.nc=ncols;
   }
 
 
@@ -84,17 +78,13 @@ public class SparseMatrix implements Matrix
    * @param o
    * @return
    */
-  @Override public Matrix mul(Matrix o)
-  {
-    if(o instanceof SparseMatrix)
-    {
-      return mul((SparseMatrix)o);
-    }
-    else if(o instanceof DenseMatrix)
-    {
-      return mul((DenseMatrix)o);
-    }
-    else throw new RuntimeException("Применяемый операнд является представителем класса иного происхождения");
+  @Override
+  public Matrix mul(Matrix o) {
+    if (o instanceof SparseMatrix) {
+      return mul((SparseMatrix) o);
+    } else if (o instanceof DenseMatrix) {
+      return mul((DenseMatrix) o);
+    } else throw new RuntimeException("Ошибка");
   }
 
   @Override
@@ -112,75 +102,60 @@ public class SparseMatrix implements Matrix
     return 0;
   }
 
-  public SparseMatrix transpose()
-  {
-    HashMap<Point,Double> transposedSMtx=new HashMap<>();
+  public SparseMatrix transpose() {
+    HashMap<Point, Double> transposedSMtx = new HashMap<>();
     Point p;
-    for(Point k:SMatr.keySet())
-    {
-      p=new Point(k.y,k.x);
-      transposedSMtx.put(p,SMatr.get(k));
+    for (Point k : val.keySet()) {
+      p = new Point(k.y, k.x);
+      transposedSMtx.put(p, val.get(k));
     }
-    return new SparseMatrix(transposedSMtx,nc,nr);
+    return new SparseMatrix(transposedSMtx, width, height);
   }
 
 
-  public SparseMatrix mul(SparseMatrix SMtx)
-  {
-    if(nc==0||SMtx.nr==0||SMatr==null||SMtx.SMatr==null) return null;
-    if(nc==SMtx.nr)
-    {
-      HashMap<Point,Double> result=new HashMap<>();
-      SparseMatrix tSMtx=SMtx.transpose();
-      for(Point k: SMatr.keySet())
-      {
-        for(int i=0;i<tSMtx.nr;i++)
-        {
-          //if(k.y==l.y)
-          Point p1=new Point(i,k.y);
-          if(tSMtx.SMatr.containsKey(p1))
-          {
-            Point p2=new Point(k.x,i);
+  public SparseMatrix mul(SparseMatrix SMtx) {
+    if (width == 0 || SMtx.height == 0 || val == null || SMtx.val == null) return null;
+    if (width == SMtx.height) {
+      HashMap<Point, Double> result = new HashMap<>();
+      SparseMatrix tSMtx = SMtx.transpose();
+      for (Point k : val.keySet()) {
+        for (int i = 0; i < tSMtx.height; i++) {
+          Point p1 = new Point(i, k.y);
+          if (tSMtx.val.containsKey(p1)) {
+            Point p2 = new Point(k.x, i);
             {
               double buf;
-              if(result.containsKey(p2))
-              {
-                buf = result.get(p2) + SMatr.get(k) * tSMtx.SMatr.get(p1);
+              if (result.containsKey(p2)) {
+                buf = result.get(p2) + val.get(k) * tSMtx.val.get(p1);
                 if (buf == 0) result.remove(p2);
                 else result.put(p2, buf);
               } else {
-                buf = SMatr.get(k) * tSMtx.SMatr.get(p1);
+                buf = val.get(k) * tSMtx.val.get(p1);
                 result.put(p2, buf);
               }
             }
           }
         }
       }
-      return new SparseMatrix(result,nr,SMtx.nc);
-    }
-    else throw new RuntimeException("Размеры матриц не отвечают матричному уможению.");
+      return new SparseMatrix(result, height, SMtx.width);
+    } else throw new RuntimeException("Размеры матриц не верны");
   }
 
-  public DenseMatrix mul(DenseMatrix DMtx){
-    if(nc==DMtx.height&&SMatr!=null&&DMtx.matrix!=null)
-    {
-      double[][] res=new double[nr][DMtx.width];
-      DenseMatrix tDMtx=DMtx.transpose();
-      for(Point p:SMatr.keySet())
-      {
-        for(int j=0;j<tDMtx.height;j++)
-        {
-          for(int k=0;k<nc;k++)
-          {
-            if(p.y==k)
-            {
-              res[p.x][j]+=SMatr.get(p)*tDMtx.matrix[j][k];
+  public DenseMatrix mul(DenseMatrix DMtx) {
+    if (width == DMtx.height && val != null && DMtx.matrix != null) {
+      double[][] res = new double[height][DMtx.width];
+      DenseMatrix tDMtx = DMtx.transpose();
+      for (Point p : val.keySet()) {
+        for (int j = 0; j < tDMtx.height; j++) {
+          for (int k = 0; k < width; k++) {
+            if (p.y == k) {
+              res[p.x][j] += val.get(p) * tDMtx.matrix[j][k];
             }
           }
         }
       }
       return new DenseMatrix(res);
-    }else throw new RuntimeException("Размеры матриц не отвечают матричному уможению.");
+    } else throw new RuntimeException("Размеры матриц не отвечают матричному уможению.");
   }
 
   /**
@@ -193,24 +168,26 @@ public class SparseMatrix implements Matrix
 
   /**
    * спавнивает с обоими вариантами
-   * @param o
+   *
+  // * @param o
    * @return
    */
 
-  @Override public String toString() {
-    if(SMatr==null) throw new RuntimeException("Встречена пустая матрица");
+  @Override
+  public String toString() {
+    if (val == null) throw new RuntimeException("Встречена пустая матрица");
     StringBuilder resBuilder = new StringBuilder();
     resBuilder.append('\n');
-    for (int i = 0; i < nr; i++) {
+    for (int i = 0; i < height; i++) {
       resBuilder.append('[');
-      for (int j = 0; j < nc; j++) {
-        Point p=new Point(i,j);
-        if (SMatr.containsKey(p)) {
-          resBuilder.append(SMatr.get(p));
+      for (int j = 0; j < width; j++) {
+        Point p = new Point(i, j);
+        if (val.containsKey(p)) {
+          resBuilder.append(val.get(p));
         } else {
           resBuilder.append(0.0);
         }
-        if (j < nc - 1)
+        if (j < width - 1)
           resBuilder.append(" ");
       }
       resBuilder.append("]\n");
@@ -218,12 +195,13 @@ public class SparseMatrix implements Matrix
     return resBuilder.toString();
   }
 
-  @Override public boolean equals(Object o) {
+  @Override
+  public boolean equals(Object o) {
     if(o instanceof DenseMatrix)
     {
       DenseMatrix DMtx=(DenseMatrix) o;
-      if (SMatr == null || DMtx.matrix == null) return false;
-      if (nr == DMtx.height && nc == DMtx.width) {
+      if (val == null || DMtx.matrix == null) return false;
+      if (height == DMtx.height && width == DMtx.width) {
         int nonzeros=0;
         for(int i=0;i<DMtx.height;i++)
         {
@@ -235,49 +213,42 @@ public class SparseMatrix implements Matrix
             }
           }
         }
-        if(nonzeros!=SMatr.size()) return false;
-        for (Point k: SMatr.keySet()) {
+        if(nonzeros!=val.size()) return false;
+        for (Point k: val.keySet()) {
           if(DMtx.matrix[k.x][k.y]==0)
             return false;
-          if (DMtx.matrix[k.x][k.y]!=SMatr.get(k)) {
+          if (DMtx.matrix[k.x][k.y]!=val.get(k)) {
             return false;
           }
         }
         return true;
       }
     }
-    else if(o instanceof SparseMatrix)
-    {
-      SparseMatrix SMtx=(SparseMatrix)o;
-      if (SMatr == null || SMtx.SMatr == null) return false;
-      if (SMtx.SMatr == SMatr) return true;
+    if (o instanceof SparseMatrix) {
+      SparseMatrix SMtx = (SparseMatrix) o;
+      if (val == null || SMtx.val == null) return false;
+      if (SMtx.val == val) return true;
       if (this.hashCode() != SMtx.hashCode()) return false;
-      if (nr != SMtx.nr || nc != SMtx.nc) return false;
-      if (SMatr.size()!=SMtx.SMatr.size())return false;
-      for (Point p:SMatr.keySet()) {
-        if (SMatr.get(p)-(SMtx.SMatr.get(p))!=0)
+      if (height != SMtx.height || width != SMtx.width) return false;
+      if (val.size() != SMtx.val.size()) return false;
+      for (Point p : val.keySet()) {
+        if (val.get(p) - (SMtx.val.get(p)) != 0)
           return false;
-      }return true;
-
-
+      }
+      return true;
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    int hsh=Objects.hash(nr,nc);
-    for(Point p:SMatr.keySet())
-    {
-      hsh+=(SMatr.get(p).hashCode()<<2)+31;
+    int hsh = Objects.hash(height, width);
+    for (Point p : val.keySet()) {
+      hsh += (val.get(p).hashCode() << 2) + 31;
     }
 
     return hsh;
   }
-
-
-
-
 }
 
 

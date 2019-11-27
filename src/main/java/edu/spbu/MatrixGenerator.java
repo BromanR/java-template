@@ -16,8 +16,8 @@ public class MatrixGenerator
   public static final int SEED2 = 2;
   public static final int EMPTY_ROW_FRACTION = 10;
 
-  public static final String MATRIX1_NAME = "m1.txt";
-  public static final String MATRIX2_NAME = "m2.txt";
+  public static final String MATRIX1_NAME = "sparse1.txt";
+  public static final String MATRIX2_NAME = "sparse2.txt";
   public static final int SIZE = 2000;
 
   private final int emptyRowFraction;
@@ -41,7 +41,7 @@ public class MatrixGenerator
     {
       new MatrixGenerator(SEED1, EMPTY_ROW_FRACTION, MATRIX1_NAME, SIZE).generate();
       new MatrixGenerator(SEED2, EMPTY_ROW_FRACTION, MATRIX2_NAME, SIZE).generate();
-      testPerformance();
+//      testPerformance();
     }
     catch (IOException e)
     {

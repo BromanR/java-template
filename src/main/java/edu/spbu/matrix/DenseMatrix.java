@@ -1,5 +1,6 @@
 package edu.spbu.matrix;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -57,8 +58,20 @@ public class DenseMatrix implements Matrix {
   /**
    * однопоточное умнджение матриц
    */
-  @Override
-  public Matrix mul(Matrix other) {
+  @Override public Matrix mul(Matrix o)
+  {
+    if(o instanceof DenseMatrix)
+      return this.mul((DenseMatrix) o);
+    else if(o instanceof SparseMatrix)
+    {
+      return this.mul ((SparseMatrix)o);
+    }
+    else throw new RuntimeException("Применяемый операнд является представителем класса иного происхождения");
+
+  }
+
+
+  public Matrix mul(DenseMatrix other) {
     if (other instanceof DenseMatrix && this.getWidth() == other.getHeight()) {
       DenseMatrix dm = (DenseMatrix) other;
       int newHeight = this.height, newWidth = dm.width;
@@ -77,6 +90,32 @@ public class DenseMatrix implements Matrix {
     }
     throw new IllegalArgumentException(String.format("Can't multiply matrices of size (%n, %n) and (%n, %n)", this.width, this.height, other.getHeight(), other.getWidth()));
   }
+
+
+  public DenseMatrix mul(SparseMatrix SMtx){
+    if(width==0&&SMtx.height==0) return null;
+    if(width==SMtx.height)
+    {
+      double[][] res=new double[height][SMtx.width];
+      for(int i=0;i<height;i++)
+      {
+        for(Point p:SMtx.val.keySet())
+        {
+          for(int k=0;k<height;k++)
+          {
+            if(p.x==k)
+            {
+              res[i][p.y]+=matrix[i][k]*SMtx.val.get(p);
+            }
+          }
+        }
+      }
+      return new DenseMatrix(res);
+    }else throw new RuntimeException("Размеры матриц не отвечают матричному уможению.");
+  }
+
+
+
 
   /**
    * многопоточное умножение матриц
@@ -107,9 +146,9 @@ public class DenseMatrix implements Matrix {
         return false;
       }
 
-      if (this.hachCode != dm.hachCode) {
-        return false;
-      }
+     // if (this.hachCode != dm.hachCode) {
+      //  return false;
+      //}
 
       for (int i = 0; i < this.getHeight(); ++i) {
         for (int j = 0; j < this.getWidth(); ++j) {
