@@ -92,11 +92,12 @@ public class DenseMatrix implements Matrix {
   }
 
 
-  public DenseMatrix mul(SparseMatrix SMtx){
+ /* public DenseMatrix mul(SparseMatrix SMtx){
     if(width==0&&SMtx.height==0) return null;
     if(width==SMtx.height)
     {
       double[][] res=new double[height][SMtx.width];
+
       for(int i=0;i<height;i++)
       {
         for(Point p:SMtx.val.keySet())
@@ -112,8 +113,23 @@ public class DenseMatrix implements Matrix {
       }
       return new DenseMatrix(res);
     }else throw new RuntimeException("Размеры матриц не отвечают матричному уможению.");
-  }
+  } */
 
+
+  public DenseMatrix mul(SparseMatrix SMtx) {
+    if (width == SMtx.height && SMtx.val != null && matrix != null) {
+      double[][] res = new double[height][SMtx.width];
+
+      for (Point p : SMtx.val.keySet()) {
+        for (int j = 0; j < height; j++) {
+            {
+              res[j][p.y] += SMtx.val.get(p) * matrix[j][p.x];
+            }
+        }
+      }
+      return new DenseMatrix(res);
+    } else throw new RuntimeException("Размеры матриц не отвечают матричному уможению.");
+  }
 
 
 
@@ -208,5 +224,23 @@ public class DenseMatrix implements Matrix {
     }
     return new DenseMatrix(transposedDMtx);
   }
+
+  @Override public String toString() {
+    if(matrix==null) throw new RuntimeException("Встречена пустая матрица");
+    StringBuilder resBuilder=new StringBuilder();
+    resBuilder.append('\n');
+    for(int i=0;i<height;i++) {
+      resBuilder.append('[');
+      for (int j = 0; j < width; j++) {
+        resBuilder.append(matrix[i][j]);
+        if (j < width - 1)
+          resBuilder.append(" ");
+      }
+      resBuilder.append("]\n");
+
+    }
+    return resBuilder.toString();
+  }
+
 
 }

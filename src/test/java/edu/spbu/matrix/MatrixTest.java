@@ -53,7 +53,7 @@ public class MatrixTest {
     System.out.println(finish - start);
   }
 
-  //Тест умножения плотной матрицы на разреженную. Ождиается успех.
+  //Тест умножения плотной матрицы на разреженную
   @Test
   public void mulDSEx1() {
     Matrix m1 = new DenseMatrix("dm1.txt");
@@ -65,7 +65,7 @@ public class MatrixTest {
     assertEquals(expected, m1.mul(m2));
   }
 
-  @Test  //Тест умножения разреженной матрицы и плотной. Ожидается успех.
+  @Test  //Тест умножения разреженной матрицы и плотной
   public void mulSDEx1() {
     Matrix m1 = new SparseMatrix("PermutationMatrix.txt");
     Matrix m2 = new DenseMatrix("dm1.txt");
