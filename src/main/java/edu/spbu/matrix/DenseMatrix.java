@@ -15,7 +15,7 @@ public class DenseMatrix implements Matrix {
   public double[][] matrix;
   public int hachCode;
 
-  private DenseMatrix(int height, int width, double[][] matrix) {
+  public DenseMatrix(int height, int width, double[][] matrix) {
     this.height = height;
     this.width = width;
     this.matrix = matrix;
@@ -55,82 +55,11 @@ public class DenseMatrix implements Matrix {
     }
   }
 
-  /**
-   * однопоточное умнджение матриц
-   */
-  @Override public Matrix mul(Matrix o)
-  {
-    if(o instanceof DenseMatrix)
-      return this.mul((DenseMatrix) o);
-    else if(o instanceof SparseMatrix)
-    {
-      return this.mul ((SparseMatrix)o);
-    }
-    else throw new RuntimeException("Применяемый операнд является представителем класса иного происхождения");
 
-  }
-
-
-  public Matrix mul(DenseMatrix other) {
-    if (other instanceof DenseMatrix && this.getWidth() == other.getHeight()) {
-      DenseMatrix dm = (DenseMatrix) other;
-      int newHeight = this.height, newWidth = dm.width;
-      double[][] matrix = new double[newHeight][newWidth];
-
-
-      matrix = new double[newHeight][newWidth];
-      for (int i = 0; i < newHeight; ++i) {
-        for (int j = 0; j < newWidth; ++j) {
-          for (int k = 0; k < this.width; ++k) {
-            matrix[i][j] += this.matrix[i][k] * dm.matrix[k][j];
-          }
-        }
-      }
-      return new DenseMatrix(newHeight, newWidth, matrix);
-    }
-    throw new IllegalArgumentException(String.format("Can't multiply matrices of size (%n, %n) and (%n, %n)", this.width, this.height, other.getHeight(), other.getWidth()));
-  }
-
-
- /* public DenseMatrix mul(SparseMatrix SMtx){
-    if(width==0&&SMtx.height==0) return null;
-    if(width==SMtx.height)
-    {
-      double[][] res=new double[height][SMtx.width];
-
-      for(int i=0;i<height;i++)
-      {
-        for(Point p:SMtx.val.keySet())
-        {
-          for(int k=0;k<height;k++)
-          {
-            if(p.x==k)
-            {
-              res[i][p.y]+=matrix[i][k]*SMtx.val.get(p);
-            }
-          }
-        }
-      }
-      return new DenseMatrix(res);
-    }else throw new RuntimeException("Размеры матриц не отвечают матричному уможению.");
-  } */
-
-
-  public DenseMatrix mul(SparseMatrix SMtx) {
-    if (width == SMtx.height && SMtx.val != null && matrix != null) {
-      double[][] res = new double[height][SMtx.width];
-
-      for (Point p : SMtx.val.keySet()) {
-        for (int j = 0; j < height; j++) {
-            {
-              res[j][p.y] += SMtx.val.get(p) * matrix[j][p.x];
-            }
-        }
-      }
-      return new DenseMatrix(res);
-    } else throw new RuntimeException("Размеры матриц не отвечают матричному уможению.");
-  }
-
+ @Override
+ public Matrix mul(Matrix o) {
+   return UniversalMul.mul(this, o);
+ }
 
 
   /**
@@ -141,7 +70,7 @@ public class DenseMatrix implements Matrix {
    */
   @Override
   public Matrix dmul(Matrix o) {
-    return null;
+    return UniversalMul.dmul(this, o);
   }
 
   /**
@@ -242,5 +171,14 @@ public class DenseMatrix implements Matrix {
     return resBuilder.toString();
   }
 
+  public DenseMatrix submatrix(int x1, int x2) {
+    double[][] out = new double[x2 - x1][];
+    if (x2>this.getHeight()) { x2=this.getHeight();}
+    for (int i = 0; i < x2 - x1; ++i) {
+      out[i] = Arrays.copyOfRange(this.matrix[i + x1], 0, this.getWidth());
+    }
+
+    return new DenseMatrix(x2 - x1, this.getWidth(), out);
+  }
 
 }

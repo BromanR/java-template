@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Разряженная матрица
@@ -40,10 +42,7 @@ public class SparseMatrix implements Matrix {
       int length = 0, height = 0;
       double element;
       while (line != null) {
-        // System.out.println(line);
         Currln = line.split(" ");
-        //String intArrayString = Arrays.toString(Currln);
-        //System.out.println(intArrayString);
         length = Currln.length;
         for (int i = 0; i < length; i++) {
           if (!Currln[0].isEmpty()) {
@@ -80,27 +79,36 @@ public class SparseMatrix implements Matrix {
    */
   @Override
   public Matrix mul(Matrix o) {
-    if (o instanceof SparseMatrix) {
-      return mul((SparseMatrix) o);
-    } else if (o instanceof DenseMatrix) {
-      return mul((DenseMatrix) o);
-    } else throw new RuntimeException("Ошибка");
+      return UniversalMul.mul(this, o);
   }
 
-  @Override
-  public Matrix dmul(Matrix o) {
-    return null;
-  }
+
 
   @Override
   public int getHeight() {
-    return 0;
+    return this.height;
   }
 
   @Override
   public int getWidth() {
-    return 0;
+    return this.width;
   }
+
+  @Override
+  public Matrix submatrix(int x1, int x2) { return null;}
+  /*public Matrix submatrix(int x1, int x2, int y1, int y2) {
+    HashMap<Point, Double> result = new HashMap<>();
+    Point p = new Point();
+ //   for (Point k = this.val.keySet(); (k.x<x1+x2 & k.y <y1+y2), ++Point);
+    for (Point k : this.val.keySet()){
+      if ((k.x<x1+x2 && k.x>x1) && (k.y<y1+y2 && k.y>y1)) {
+        p.x = k.x;
+        p.y = k.y;
+        result.put(p, this.val.get(k));
+      }
+    }
+    return new SparseMatrix(result, x2 - x1, y2 - y1);
+  } */
 
   public SparseMatrix transpose() {
     HashMap<Point, Double> transposedSMtx = new HashMap<>();
@@ -113,50 +121,7 @@ public class SparseMatrix implements Matrix {
   }
 
 
-  public SparseMatrix mul(SparseMatrix SMtx) {
-    if (width == 0 || SMtx.height == 0 || val == null || SMtx.val == null) return null;
-    if (width == SMtx.height) {
-      HashMap<Point, Double> result = new HashMap<>();
-      SparseMatrix tSMtx = SMtx.transpose();
-      for (Point k : val.keySet()) {
-        for (int i = 0; i < tSMtx.height; i++) {
-          Point p1 = new Point(i, k.y);
-          if (tSMtx.val.containsKey(p1)) {
-            Point p2 = new Point(k.x, i);
-            {
-              double buf;
-              if (result.containsKey(p2)) {
-                buf = result.get(p2) + val.get(k) * tSMtx.val.get(p1);
-                if (buf == 0) result.remove(p2);
-                else result.put(p2, buf);
-              } else {
-                buf = val.get(k) * tSMtx.val.get(p1);
-                result.put(p2, buf);
-              }
-            }
-          }
-        }
-      }
-      return new SparseMatrix(result, height, SMtx.width);
-    } else throw new RuntimeException("Размеры матриц не верны");
-  }
 
-  public DenseMatrix mul(DenseMatrix DMtx) {
-    if (width == DMtx.height && val != null && DMtx.matrix != null) {
-      double[][] res = new double[height][DMtx.width];
-      DenseMatrix tDMtx = DMtx.transpose();
-      for (Point p : val.keySet()) {
-        for (int j = 0; j < tDMtx.height; j++) {
-          for (int k = 0; k < width; k++) {
-            if (p.y == k) {
-              res[p.x][j] += val.get(p) * tDMtx.matrix[j][k];
-            }
-          }
-        }
-      }
-      return new DenseMatrix(res);
-    } else throw new RuntimeException("Размеры матриц не отвечают матричному уможению.");
-  }
 
   /**
    * многопоточное умножение матриц
@@ -165,6 +130,10 @@ public class SparseMatrix implements Matrix {
    * @return
    */
 
+  @Override public Matrix dmul(Matrix o)
+  {
+    return UniversalMul.dmul(this, o);
+  }
 
   /**
    * спавнивает с обоими вариантами

@@ -56,10 +56,10 @@ public class MatrixTest {
   //Тест умножения плотной матрицы на разреженную
   @Test
   public void mulDSEx1() {
-    Matrix m1 = new DenseMatrix("dm1.txt");
-    Matrix m2 = new SparseMatrix("PermutationMatrix.txt");
+    Matrix m1 = new DenseMatrix("SparseA1.txt");
+    Matrix m2 = new SparseMatrix("SparseA2.txt");
     Matrix actual = m1.mul(m2);
-    Matrix expected = new DenseMatrix("PermutationResult2.txt");
+    Matrix expected = new DenseMatrix("ResA1xA2.txt");
     System.out.println("expected:" + (expected).toString());
     System.out.println("actual:" + ((DenseMatrix) actual).toString());
     assertEquals(expected, m1.mul(m2));
@@ -77,4 +77,41 @@ public class MatrixTest {
   }
 
 
+  @Test
+  public void dmulDD() {
+    Matrix m1 = new DenseMatrix("dml1.txt");
+    Matrix m2 = new DenseMatrix("dml2.txt");
+    Matrix expected = new DenseMatrix("dml1Xdml2.txt");
+
+    Matrix received = m1.dmul(m2);
+
+    assertEquals(expected, received);
+  }
+
+  @Test //small sparse
+  public void dmulSSEx1() {
+    Matrix m1 = new SparseMatrix("SparseA1.txt");
+    Matrix m2 = new SparseMatrix("SparseA2.txt");
+    Matrix actual = m1.dmul(m2);
+    Matrix expected = new SparseMatrix("ResA1xA2.txt");
+    System.out.println("expected:" + (expected).toString());
+    System.out.println("actual:" + ((SparseMatrix) actual).toString());
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void DDstack(){
+    Matrix m1 = new DenseMatrix("m4.txt");
+    Matrix m2 = new DenseMatrix("m5.txt");
+    Matrix actual = MatrixStacker.vstack(m1, m2);
+    System.out.println("actual:" + ((DenseMatrix) actual).toString());
+  }
+
+  @Test
+  public void SSstack(){
+    Matrix m1 = new SparseMatrix("m4.txt");
+    Matrix m2 = new SparseMatrix("m5.txt");
+    Matrix actual = MatrixStacker.vstack(m1, m2);
+    System.out.println("actual:" + ((DenseMatrix) actual).toString());
+  }
 }
