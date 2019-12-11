@@ -77,7 +77,7 @@ class MatrixStacker {
     int newHeight = m1.getHeight() + m2.getHeight(), newWidth = m1.getWidth();
 
     for (Point p: m2.val.keySet()){
-      Point k = new Point(p.x+m1.height , p.y);
+      Point k = new Point(p.x, p.y);
       m1.val.put(k, m2.val.get(p));
     }
 

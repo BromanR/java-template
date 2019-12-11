@@ -115,6 +115,7 @@ class UniversalMul {
     int parts = threadCount;
     ExecutorService executor = Executors.newFixedThreadPool(threadCount);
     Matrix[] Submatrices = new Matrix[parts];
+
     int height = m1.getHeight();
     int firstSize = (int) Math.floor((double)height / parts);
     int residue = height%parts;
@@ -124,7 +125,8 @@ class UniversalMul {
     for (int i = 0; i < parts; ++i) {
       if (residue<1) { k = 0;}
       Submatrices[i] = m1.submatrix(currentLine, currentLine+ firstSize + k);
-      System.out.println("Submatrices" + (Submatrices[i]).toString());
+
+
       currentLine+= firstSize+k;
       residue--;
     }

@@ -95,20 +95,15 @@ public class SparseMatrix implements Matrix {
   }
 
   @Override
-  public Matrix submatrix(int x1, int x2) { return null;}
-  /*public Matrix submatrix(int x1, int x2, int y1, int y2) {
+  public Matrix submatrix(int x1, int x2) {
     HashMap<Point, Double> result = new HashMap<>();
-    Point p = new Point();
- //   for (Point k = this.val.keySet(); (k.x<x1+x2 & k.y <y1+y2), ++Point);
     for (Point k : this.val.keySet()){
-      if ((k.x<x1+x2 && k.x>x1) && (k.y<y1+y2 && k.y>y1)) {
-        p.x = k.x;
-        p.y = k.y;
-        result.put(p, this.val.get(k));
+      if (k.x<x2 && k.x>=x1) {
+        result.put(k, this.val.get(k));
       }
     }
-    return new SparseMatrix(result, x2 - x1, y2 - y1);
-  } */
+    return new SparseMatrix(result, x2-x1, this.getWidth());
+  }
 
   public SparseMatrix transpose() {
     HashMap<Point, Double> transposedSMtx = new HashMap<>();
@@ -146,7 +141,7 @@ public class SparseMatrix implements Matrix {
   public String toString() {
     if (val == null) throw new RuntimeException("Встречена пустая матрица");
     StringBuilder resBuilder = new StringBuilder();
-    resBuilder.append('\n');
+    //resBuilder.append('\n');
     for (int i = 0; i < height; i++) {
       resBuilder.append('[');
       for (int j = 0; j < width; j++) {
@@ -164,7 +159,7 @@ public class SparseMatrix implements Matrix {
     return resBuilder.toString();
   }
 
-  @Override
+  //@Override
   public boolean equals(Object o) {
     if(o instanceof DenseMatrix)
     {
