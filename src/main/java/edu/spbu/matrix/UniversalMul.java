@@ -1,4 +1,5 @@
 package edu.spbu.matrix;
+
 import java.awt.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -37,7 +38,6 @@ class UniversalMul {
     }
     return null;
   }
-
 
   private static DenseMatrix mul(DenseMatrix m1, DenseMatrix m2) {
     int newHeight = m1.getHeight(), newWidth = m2.getWidth();
@@ -104,48 +104,45 @@ class UniversalMul {
     } else throw new RuntimeException("Размеры матриц не верны");
   }
 
-
   static Matrix dmul(Matrix m1, Matrix m2) {
     if (m1.getWidth() != m2.getHeight()) {
       return null;
     }
 
     final int threadCount = 4;
- //    int threadCount = Runtime.getRuntime().availableProcessors();
+    //int threadCount = Runtime.getRuntime().availableProcessors();
     int parts = threadCount;
     ExecutorService executor = Executors.newFixedThreadPool(threadCount);
     Matrix[] Submatrices = new Matrix[parts];
 
     int height = m1.getHeight();
-    int firstSize = (int) Math.floor((double)height / parts);
-    int residue = height%parts;
-    int k=1;
-    int currentLine=0;
+    int SubmatrixSize = (int) Math.floor((double) height / parts);
+    int residue = height % parts;
+    int k = 1; //k = 1 if residue > 0
+    int currentLine = 0;
 
     for (int i = 0; i < parts; ++i) {
-      if (residue<1) { k = 0;}
-      Submatrices[i] = m1.submatrix(currentLine, currentLine+ firstSize + k);
-
-
-      currentLine+= firstSize+k;
+      if (residue < 1) {
+        k = 0;
+      }
+      Submatrices[i] = m1.submatrix(currentLine, currentLine + SubmatrixSize + k);
+      currentLine += SubmatrixSize + k;
       residue--;
     }
 
     ArrayList<Future<Matrix>> results = new ArrayList<>(parts * m2.getWidth());
     for (int i = 0; i < parts; ++i) {
-        results.add(executor.submit(new MultiplierTask(Submatrices[i], m2)));
+      results.add(executor.submit(new MultiplierTask(Submatrices[i], m2)));
     }
 
     try {
       Matrix current = null;
-
       for (int j = 0; j < parts; ++j) {
-          if (current == null) {
-            current = results.get(j).get();
-          }
-          else {
-            current = MatrixStacker.vstack(current, results.get(j).get());
-          }
+        if (current == null) {
+          current = results.get(j).get();
+        } else {
+          current = MatrixStacker.vstack(current, results.get(j).get());
+        }
       }
       executor.shutdown();
       return current;

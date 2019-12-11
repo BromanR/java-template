@@ -66,7 +66,6 @@ public class SparseMatrix implements Matrix {
     } catch (IOException e) {
       e.printStackTrace();
     }
-
   }
 
 
@@ -81,7 +80,6 @@ public class SparseMatrix implements Matrix {
   public Matrix mul(Matrix o) {
       return UniversalMul.mul(this, o);
   }
-
 
 
   @Override
@@ -159,7 +157,7 @@ public class SparseMatrix implements Matrix {
     return resBuilder.toString();
   }
 
-  //@Override
+  @Override
   public boolean equals(Object o) {
     if(o instanceof DenseMatrix)
     {
