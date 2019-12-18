@@ -120,7 +120,7 @@ public class MatrixTest {
     assertEquals(expected, m1.mul(m2));
   }
 
-  @Test //сколько по времени умножается 2000x2000
+  @Test //сколько по времени умножается 20000x20000
   public void dMultyMulSS() {
     Matrix m1 = new SparseMatrix("sparse1.txt");
     Matrix m2 = new SparseMatrix("sparse2.txt");
