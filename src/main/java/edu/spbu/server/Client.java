@@ -11,7 +11,7 @@ public class Client implements Runnable {
 
   public static void main(String[] args) {
     try{
-      Client client = new Client("www.rzd.ru", 80);
+      Client client = new Client("www.cyberforum.ru", 80);
 //      Client client = new Client("127.0.0.1", 8080);
       client.sendData("Server");
       client.receiveData();
@@ -38,7 +38,7 @@ public class Client implements Runnable {
 
   //посылает запрос
   private void sendData(String serverName) throws IOException {
-//    String s = "GET /test.html HTTP/1.1\r\nHost:" + serverName +"\r\n\r\n";
+//   String s = "GET /test.html HTTP/1.1\r\nHost:" + serverName +"\r\n\r\n";
     String s = "GET / HTTP/1.1\r\nHost:" + serverName +"\r\n\r\n";
     output.write(s.getBytes());
     output.flush();
