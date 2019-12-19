@@ -109,8 +109,8 @@ class UniversalMul {
       return null;
     }
 
-    final int threadCount = 4;
-    //int threadCount = Runtime.getRuntime().availableProcessors();
+    //final int threadCount = 4;
+    int threadCount = Runtime.getRuntime().availableProcessors();
     int parts = threadCount;
     ExecutorService executor = Executors.newFixedThreadPool(threadCount);
     Matrix[] Submatrices = new Matrix[parts];

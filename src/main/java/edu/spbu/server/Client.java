@@ -20,9 +20,6 @@ public class Client {
         // писать туда же
         out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
         System.out.println("Вы что-то хотели сказать? Введите это здесь:");
-        // если соединение произошло и потоки успешно созданы - мы можем
-        //  работать дальше и предложить клиенту что то ввести
-        // если нет - вылетит исключение
         String word = reader.readLine(); // ждём пока клиент что-нибудь
         // не напишет в консоль
         if (word.equals("quit")) break;
